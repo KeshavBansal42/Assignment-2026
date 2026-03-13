@@ -101,13 +101,28 @@ while true; do
     echo -e "\n-------RESULTS-------"
     echo "Time: $time_taken seconds"
     echo "WPM: $wpm"
-    echo "Accuracy: $accuracy"
+    echo "Accuracy: $accuracy%"
     echo "---------------------"
 
-    echo -e "\nPress [ENTER] to try again, or type 'q' to quit."
+    timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+
+    echo "[$timestamp] Level: $difficulty | Time taken: $time_taken seconds | WPM: $wpm | Accuracy: $accuracy%" >> score_history.txt
+
+    echo -e "\nPress [ENTER] to try again, type 'h' for past scores or type 'q' to quit."
     read -r choice
 
-    if [[ "$choice" == "q" || "$choice" == "Q" ]]; then
+    if [[ "$choice" == "h" || "$choice" == "H" ]]; then
+        if [ -f "score_history.txt" ]; then
+            echo "-------Past-Scores-------"
+            tail -n 5 score_history.txt
+            echo "For more past scores check the contents of score_history.txt"
+
+            echo "Press [ENTER] to continue to the next round."
+            read -s
+        else
+            echo "No history yet!"
+        fi
+    elif [[ "$choice" == "q" || "$choice" == "Q" ]]; then
         echo "Thanks for playing!"
         break
     fi
