@@ -115,6 +115,20 @@ while true; do
         if [ -f "score_history.txt" ]; then
             echo "-------Past-Scores-------"
             tail -n 5 score_history.txt
+
+            echo -e "\n--- WPM PROGRESS GRAPH (Last 10 Games) ---\n"
+
+            wpm_scores=$(tail -n 10 score_history.txt | grep -Eo 'WPM: [0-9]+' | grep -Eo '[0-9]+')
+            game_num=1
+
+            for w in $wpm_scores; do
+                bar_length=$((w/3))
+                bar=$(printf "%${bar_length}s" | tr ' ' '#')
+                printf "Game %2d (%3d WPM): %s\n" "$game_num" "$w" "$bar"
+
+                ((game_num++))
+            done
+            echo -e "\n------------------------------------------------------------"
             echo "For more past scores check the contents of score_history.txt"
 
             echo "Press [ENTER] to continue to the next round."
