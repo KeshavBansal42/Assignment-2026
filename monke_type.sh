@@ -53,6 +53,8 @@ RED='\033[0;41m'
 NC='\033[0m'
 GREEN='\033[0;42m'
 
+time_upper_limit=100
+
 echo "Press [Enter] when you are ready to start..."
 read -s
 
@@ -82,6 +84,9 @@ while true; do
     while true; do
         current_time=$(date +%s)
         elapsed_time=$((current_time-start_time))
+        if [[ "$elapsed_time" -ge "$time_upper_limit" ]]; then
+            break
+        fi
         echo "===================================="
         echo "Live Timer: $elapsed_time s"
         echo "===================================="
