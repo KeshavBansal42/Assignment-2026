@@ -46,7 +46,12 @@ clear
 
 echo "Welcome to MonkeType!"
 echo "Select difficulty: ([e]asy/[m]edium/[h]ard)"
-read difficulty
+read -n 1 -s difficulty
+clear
+
+RED='\033[0;41m'
+NC='\033[0m'
+GREEN='\033[0;42m'
 
 echo "Press [Enter] when you are ready to start..."
 read -s
@@ -64,14 +69,54 @@ while true; do
         target_text=$(get_random_easy_sentence)
     fi
 
-    echo "===================================="
-    echo "Type this MF:"
-    echo "$target_text"
-    echo "===================================="
+    # start_time=$(date +%s)
 
+    # read -p "> " user_input
     start_time=$(date +%s)
-
-    read -p "> " user_input
+    user_input=""
+    display_input=""
+    temp="$target_text"
+    target_len=${#target_text}
+    i=0
+    # for ((i=0; i<target_len; i++ )); do
+    while true; do
+        current_time=$(date +%s)
+        elapsed_time=$((current_time-start_time))
+        echo "===================================="
+        echo "Live Timer: $elapsed_time s"
+        echo "===================================="
+        echo "Type this MF:"
+        # echo "$target_text"
+        echo "===================================="
+        echo -e "$display_input${temp:i}"
+        IFS= read -t 0.1 -s -n 1 input_key
+        if [[ -n "$input_key" ]]; then
+            char_input="$input_key"
+            if [[ "$char_input" == $'\x7f' ]] || [[ "$char_input" == $'\x08' ]]; then
+                user_input=${user_input%?}
+                display_input=${display_input%??????????????????}
+                if [[ "$i" -gt "0" ]]; then
+                    i=$((i-2))
+                fi
+            else
+                user_input="$user_input$char_input"
+                # temp="${temp:1}"
+                if [[ "$char_input" == "${target_text:$i:1}" ]]; then
+                    display_input="${display_input}${GREEN}$char_input${NC}"
+                else
+                    display_input="${display_input}${RED}$char_input${NC}"
+                fi
+            fi
+            ((i++))
+        fi
+        # clear
+        echo -ne "\033[H"
+        if [[ "$i" -eq "$target_len" ]]; then
+            break;
+        fi
+    done
+    
+    clear
 
     end_time=$(date +%s)
     time_taken=$((end_time - start_time))
@@ -85,7 +130,7 @@ while true; do
     wpm=$(( (words_typed * 60) / time_taken ))
 
     correct_chars=0
-    target_len=${#target_text}
+    # target_len=${#target_text}
 
     for (( i=0; i<target_len; i++ )); do
         char_target="${target_text:$i:1}"
@@ -103,17 +148,18 @@ while true; do
     echo "WPM: $wpm"
     echo "Accuracy: $accuracy%"
     echo "---------------------"
+    # echo "$user_input"
 
     timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 
     echo "[$timestamp] Level: $difficulty | Time taken: $time_taken seconds | WPM: $wpm | Accuracy: $accuracy%" >> score_history.txt
 
     echo -e "\nPress [ENTER] to try again, type 'h' for past scores or type 'q' to quit."
-    read -r choice
+    read -n 1 -r -s choice
 
     if [[ "$choice" == "h" || "$choice" == "H" ]]; then
         if [ -f "score_history.txt" ]; then
-            echo "-------Past-Scores-------"
+            echo -e "\n-------Past-Scores-------\n"
             tail -n 5 score_history.txt
 
             echo -e "\n--- WPM PROGRESS GRAPH (Last 10 Games) ---\n"
