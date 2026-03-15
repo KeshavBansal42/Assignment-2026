@@ -115,7 +115,7 @@ while true; do
             break;
         fi
     done
-    
+
     clear
 
     end_time=$(date +%s)
@@ -129,19 +129,32 @@ while true; do
     words_typed=$((char_count / 5))
     wpm=$(( (words_typed * 60) / time_taken ))
 
-    correct_chars=0
+    correct_words=0
     # target_len=${#target_text}
 
-    for (( i=0; i<target_len; i++ )); do
-        char_target="${target_text:$i:1}"
-        char_user="${user_input:$i:1}"
+    # for (( i=0; i<target_len; i++ )); do
+    #     char_target="${target_text:$i:1}"
+    #     char_user="${user_input:$i:1}"
 
-        if [[ "$char_target" == "$char_user" ]]; then
-            ((correct_chars++))
+    #     if [[ "$char_target" == "$char_user" ]]; then
+    #         ((correct_chars++))
+    #     fi
+    # done
+
+    # accuracy=$(( (correct_chars * 100) / target_len ))
+
+    target_words=($target_text)
+    user_words=($user_input)
+
+    target_words_len=${#target_words[@]}
+
+    for (( i=0; i<target_words_len; i++ )); do
+        if [[ "${target_words[$i]}" == "${user_words[$i]}" ]]; then
+            ((correct_words++))
         fi
     done
 
-    accuracy=$(( (correct_chars * 100) / target_len ))
+    accuracy=$(( (correct_words * 100) / target_words_len ))
 
     echo -e "\n-------RESULTS-------"
     echo "Time: $time_taken seconds"
