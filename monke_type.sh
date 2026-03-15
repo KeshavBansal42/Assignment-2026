@@ -90,6 +90,10 @@ while true; do
         echo "===================================="
         echo -e "$display_input${temp:i}"
         IFS= read -t 0.1 -s -n 1 input_key
+        read_status=$?
+        if [[ -z "$input_key" && "$read_status" -eq "0" ]]; then
+            break
+        fi
         if [[ -n "$input_key" ]]; then
             char_input="$input_key"
             if [[ "$char_input" == $'\x7f' ]] || [[ "$char_input" == $'\x08' ]]; then
@@ -109,6 +113,8 @@ while true; do
                        ((i++))
                     fi
                 done
+            # elif [[ -z "$char_input" ]]; then
+            #     break
             else
                 user_input="$user_input$char_input"
                 # temp="${temp:1}"
