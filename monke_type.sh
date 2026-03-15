@@ -80,6 +80,10 @@ while true; do
     temp="$target_text"
     target_len=${#target_text}
     i=0
+    
+    declare -a disp_history
+    declare -a i_history
+
     # for ((i=0; i<target_len; i++ )); do
     while true; do
         current_time=$(date +%s)
@@ -94,6 +98,7 @@ while true; do
         # echo "$target_text"
         echo "===================================="
         echo -e "$display_input${temp:i}"
+        echo -ne "\033[J"
         IFS= read -t 0.1 -s -n 1 input_key
         read_status=$?
         if [[ -z "$input_key" && "$read_status" -eq "0" ]]; then
@@ -102,31 +107,34 @@ while true; do
         if [[ -n "$input_key" ]]; then
             char_input="$input_key"
             if [[ "$char_input" == $'\x7f' ]] || [[ "$char_input" == $'\x08' ]]; then
-                user_input=${user_input%?}
-                display_input=${display_input%??????????????????}
-                if [[ "$i" -gt "0" ]]; then
-                    i=$((i-2))
+                if [[ ${#user_input} -gt 0 ]]; then
+                    user_input="${user_input%?}"
+                    idx=${#user_input}
+                    display_input="${disp_history[$idx]}"
+                    i=$(( i_history[idx] - 1 ))
                 fi
-            elif [[ "$char_input" == " " ]]; then
-                user_input="$user_input$char_input"
-                while true; do
-                    if [[ "${target_text:$i:1}" == " " || "$i" -eq "$target_len" ]]; then
-                       display_input="${display_input}${GREEN} ${NC}"
-                        break;
-                    else
-                       display_input="${display_input}${RED}${target_text:$i:1}${NC}"
-                       ((i++))
-                    fi
-                done
-            # elif [[ -z "$char_input" ]]; then
-            #     break
             else
-                user_input="$user_input$char_input"
-                # temp="${temp:1}"
-                if [[ "$char_input" == "${target_text:$i:1}" ]]; then
-                    display_input="${display_input}${GREEN}$char_input${NC}"
+                idx=${#user_input}
+                i_history[$idx]=$i
+                disp_history[$idx]="$display_input"
+                if [[ "$char_input" == " " ]]; then
+                    user_input="$user_input$char_input"
+                    while true; do
+                        if [[ "${target_text:$i:1}" == " " || "$i" -ge "$target_len" ]]; then
+                           display_input="${display_input}${GREEN} ${NC}"
+                           break;
+                        else
+                           display_input="${display_input}${RED}${target_text:$i:1}${NC}"
+                           ((i++))
+                        fi
+                    done
                 else
-                    display_input="${display_input}${RED}$char_input${NC}"
+                    user_input="$user_input$char_input"
+                    if [[ "$char_input" == "${target_text:$i:1}" ]]; then
+                        display_input="${display_input}${GREEN}$char_input${NC}"
+                    else
+                        display_input="${display_input}${RED}$char_input${NC}"
+                    fi
                 fi
             fi
             ((i++))
