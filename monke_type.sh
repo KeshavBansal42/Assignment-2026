@@ -109,7 +109,7 @@ while true; do
                        display_input="${display_input}${GREEN} ${NC}"
                         break;
                     else
-                       display_input="${display_input}${RED} ${NC}"
+                       display_input="${display_input}${RED}${target_text:$i:1}${NC}"
                        ((i++))
                     fi
                 done
