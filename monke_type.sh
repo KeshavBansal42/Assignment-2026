@@ -174,7 +174,8 @@ while true; do
     # accuracy=$(( (correct_chars * 100) / target_len ))
 
     target_words=($target_text)
-    user_words=($user_input)
+    # user_words=($user_input)
+    IFS=$'\a\n' read -r -a user_words <<< "${user_input// /$'\a'}"
 
     target_words_len=${#target_words[@]}
 
