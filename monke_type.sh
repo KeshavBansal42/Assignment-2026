@@ -98,6 +98,17 @@ while true; do
                 if [[ "$i" -gt "0" ]]; then
                     i=$((i-2))
                 fi
+            elif [[ "$char_input" == " " ]]; then
+                user_input="$user_input$char_input"
+                while true; do
+                    if [[ "${target_text:$i:1}" == " " || "$i" -eq "$target_len" ]]; then
+                       display_input="${display_input}${GREEN} ${NC}"
+                        break;
+                    else
+                       display_input="${display_input}${RED} ${NC}"
+                       ((i++))
+                    fi
+                done
             else
                 user_input="$user_input$char_input"
                 # temp="${temp:1}"
