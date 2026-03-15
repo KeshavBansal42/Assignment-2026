@@ -128,7 +128,7 @@ while true; do
         fi
         # clear
         echo -ne "\033[H"
-        if [[ "$i" -eq "$target_len" ]]; then
+        if [[ "$i" -ge "$target_len" ]]; then
             break;
         fi
     done
